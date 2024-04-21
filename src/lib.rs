@@ -179,10 +179,6 @@ where
 mod tests {
     use super::*;
 
-    fn create_dummy_list<'a>() -> DoublyLinkedList<'a, i32> {
-        doubly_linked_list!(1, 2)
-    }
-
     #[test]
     fn it_can_debug_a_node() {
         let node = Node {
