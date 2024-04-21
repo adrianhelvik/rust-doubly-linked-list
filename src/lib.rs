@@ -242,7 +242,7 @@ mod tests {
             second.push(*i.clone());
         }
 
-        assert_eq!(vec![first, second], vec![vec![1, 2], vec![1, 2]]);
+        assert_eq!([first, second], [vec![1, 2], vec![1, 2]]);
     }
 
     #[test]
@@ -271,16 +271,17 @@ mod tests {
     fn it_can_reverse_iterate_over_the_items_multiple_times() {
         let list = doubly_linked_list!(1, 2);
 
-        let mut out = Vec::<i32>::new();
+        let mut first = Vec::<i32>::new();
+        let mut second = Vec::<i32>::new();
 
         for i in list.rev_iter() {
-            out.push(*i.clone());
+            first.push(*i.clone());
         }
 
         for i in list.rev_iter() {
-            out.push(*i.clone());
+            second.push(*i.clone());
         }
 
-        assert_eq!(out, vec![2, 1, 2, 1]);
+        assert_eq!([first, second], [vec![2, 1], vec![2, 1]]);
     }
 }
