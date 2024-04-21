@@ -66,6 +66,29 @@ pub struct NodeIterator<'a, T> {
     reverse: bool,
 }
 
+// Get the next item in a node iterator.
+// `$key` should be either `prev` or `next`.
+macro_rules! iterate_in_direction {
+    ($self:ident, $key:ident) => {{
+        let node = $self.node.take();
+        match node {
+            Some(node) => {
+                let new_cell = Rc::clone(&node.value);
+                let value = node.$key.take();
+                $self.node = match value {
+                    Some(value) => {
+                        *node.next.borrow_mut() = Some(Rc::clone(&value));
+                        Some(Rc::clone(&value))
+                    }
+                    None => None,
+                };
+                Some(new_cell)
+            }
+            None => None,
+        }
+    }};
+}
+
 impl<'a, T> Iterator for NodeIterator<'a, T>
 where
     T: std::fmt::Debug,
@@ -75,40 +98,10 @@ where
     fn next(&mut self) -> Option<Rc<T>> {
         match self.reverse {
             false => {
-                let node = self.node.take();
-                match node {
-                    Some(node) => {
-                        let item = Rc::clone(&node.value);
-                        let next = node.next.take();
-                        self.node = match next {
-                            Some(next) => {
-                                *node.next.borrow_mut() = Some(Rc::clone(&next));
-                                Some(Rc::clone(&next))
-                            }
-                            None => None,
-                        };
-                        Some(item)
-                    }
-                    None => None,
-                }
+                iterate_in_direction!(self, next)
             }
             true => {
-                let node = self.node.take();
-                match node {
-                    Some(node) => {
-                        let item = Rc::clone(&node.value);
-                        let prev = node.prev.take();
-                        self.node = match prev {
-                            Some(prev) => {
-                                *node.prev.borrow_mut() = Some(Rc::clone(&prev));
-                                Some(Rc::clone(&prev))
-                            }
-                            None => None,
-                        };
-                        Some(item)
-                    }
-                    None => None,
-                }
+                iterate_in_direction!(self, prev)
             }
         }
     }
